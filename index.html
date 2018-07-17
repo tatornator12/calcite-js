@@ -75,7 +75,10 @@
       {
         name: "calcite-maps",
         location: "https://esri.github.io/calcite-maps/dist/js/dojo"
-      }]
+      }],
+      has: {
+        "esri-featurelayer-webgl": 1
+      }
     };
   </script>
 
@@ -89,6 +92,7 @@
       "esri/Map",
       "esri/WebMap",
       "esri/views/MapView",
+      "esri/layers/FeatureLayer",
       // Widgets
       "esri/widgets/Home",
       "esri/widgets/Zoom",
@@ -102,7 +106,7 @@
       "calcite-maps/calcitemaps-arcgis-support-v0.7",
       "dojo/on",
       "dojo/domReady!"
-    ], function(Map, WebMap, MapView, Home, Zoom, Legend, Collapse, Dropdown, CalciteMaps, CalciteMapArcGISSupport, on) {
+    ], function(Map, WebMap, MapView, FeatureLayer, Home, Zoom, Legend, Collapse, Dropdown, CalciteMaps, CalciteMapArcGISSupport, on) {
       /******************************************************************
        *
        * Create the map, view and widgets
