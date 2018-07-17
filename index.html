@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="description" content="ArcGIS JS v4, Calcite Maps and Bootstrap Example">
+ 
+  <title>ArcGIS JS v4, Calcite Maps and Bootstrap Example</title>
+
+  <!-- Calcite Maps Bootstrap -->
+  <link rel="stylesheet" href="https://esri.github.io/calcite-maps/dist/css/calcite-maps-bootstrap.min-v0.7.css">
+  
+  <!-- Calcite Maps -->
+  <link rel="stylesheet" href="https://esri.github.io/calcite-maps/dist/css/calcite-maps-arcgis-4.x.min-v0.7.css">
+
+  <!-- ArcGIS JS 4 -->
+  <link rel="stylesheet" href="https://js.arcgis.com/4.8/esri/css/main.css">
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+
+</head>
+
+<body class="calcite-maps calcite-nav-top">
+  <!-- Navbar -->
+
+  <nav class="navbar calcite-navbar navbar-fixed-top calcite-text-light calcite-bgcolor-dark-blue">
+    <!-- Title -->
+    <div class="calcite-title calcite-overflow-hidden">
+      <span class="calcite-title-main" style="font-weight:bold; padding-left:10px;">Bangladesh Interactive Poverty Map</span>
+    </div>
+    <!-- Menu -->
+    <div class="dropdown calcite-dropdown calcite-text-dark calcite-bg-light" role="presentation" style="position:absolute; left:400px;">
+      <a class="dropdown-toggle" role="menubutton" aria-haspopup="true" aria-expanded="false" tabindex="0">
+        <div class="calcite-dropdown-toggle" style="width:60px; color:white; font-size:16px; right:10px;"> Indicator <b class="caret" style="position:absolute; left:70px; top:8px;"></b></div>
+      </a>
+      <ul class="dropdown-menu" role="menu">
+        <li><span style="font-weight:bold; padding-left:5px; margin-top:10px; display:inline-block;">Poverty</span></li>
+        <li class="divider"></li>
+        <li><a role="menuitem" tabindex="0"><div class="indicator" data-id="0">Poverty Headcount Ratio</div></a></li>
+        <li><a role="menuitem" tabindex="0"><div class="indicator" data-id="1">Extreme Poverty Headcount Ratio</div></a></li>
+        <li><a role="menuitem" tabindex="0"><div class="indicator" data-id="2">Percentage of Population in Bottom 40%</div></a></li>
+        <li><span style="font-weight:bold; padding-left:5px; margin-top:10px; display:inline-block;">Demographics</span></li>
+        <li class="divider"></li>
+        <li><a role="menuitem" tabindex="0"><div class="indicator" data-id="3">Population Between 0 and 6 Years Old</div></a></li>
+        <li><a role="menuitem" tabindex="0"><div class="indicator" data-id="4">Population Between 7 and 14 Years Old</div></a></li>
+        <li><a role="menuitem" tabindex="0"><div class="indicator" data-id="5">Population Between 15 and 64 Years Old</div></a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!--/.calcite-navbar -->
+
+  <!-- Map  -->
+
+  <div class="calcite-map calcite-map-absolute">
+    <div id="mapViewDiv"></div>
+  </div>
+
+  <!-- /.calcite-map -->
+
+  <script type="text/javascript">
+    var dojoConfig = {
+      packages: [{
+        name: "bootstrap",
+        location: "https://esri.github.io/calcite-maps/dist/vendor/dojo-bootstrap"
+      },
+      {
+        name: "calcite-maps",
+        location: "https://esri.github.io/calcite-maps/dist/js/dojo"
+      }]
+    };
+  </script>
+
+  <!-- ArcGIS JS 4 -->
+  <script src="https://js.arcgis.com/4.8/"></script>
+
+  <script>
+    
+    require([
+      // ArcGIS
+      "esri/Map",
+      "esri/WebMap",
+      "esri/views/MapView",
+      // Widgets
+      "esri/widgets/Home",
+      "esri/widgets/Zoom",
+      "esri/widgets/Legend",
+      // Bootstrap
+      "bootstrap/Collapse",
+      "bootstrap/Dropdown",
+      // Calcite Maps
+      "calcite-maps/calcitemaps-v0.7",
+      // Calcite Maps ArcGIS Support
+      "calcite-maps/calcitemaps-arcgis-support-v0.7",
+      "dojo/on",
+      "dojo/domReady!"
+    ], function(Map, WebMap, MapView, Home, Zoom, Legend, Collapse, Dropdown, CalciteMaps, CalciteMapArcGISSupport, on) {
+      /******************************************************************
+       *
+       * Create the map, view and widgets
+       * 
+       ******************************************************************/
+     
+      var webmapids = [
+        "5131497f691e4b83b2a56dcb13500694",
+        "ad318a0d70e049889ce5058cd373553e",
+        "945835b630db45cea2f1262f832aecba",
+        "9d246132376a416f8e1a933d47e43e76",
+        "b246ace13c3040f687c3c45c35ff7a02",
+        "2e770c351de242e59000fc0a85c22795"
+        ];
+     
+     
+      // Map
+      var webmaps = webmapids.map(function(webmapid) {
+        return new WebMap({
+          portalItem: {
+            id: webmapid
+          }
+        });
+      });
+      
+      
+      // View
+      var mapView = new MapView({
+        container: "mapViewDiv",
+        map: webmaps[0],
+        center: [90, 24],
+        scale: 5000000,
+        padding: {
+          top: 50,
+          bottom: 0
+        },
+        ui: {components: []}
+      });
+      // Popup and panel sync
+      
+      mapView.when(function(){
+        CalciteMapArcGISSupport.setPopupPanelSync(mapView);
+      });
+     
+      
+      on(document.querySelector(".dropdown"), ".indicator:click", function(event) {
+        var id = event.target.getAttribute("data-id");
+        if (id) {
+          var webmap = webmaps[id];
+          mapView.map = webmap;
+        }
+      });
+      
+      
+      // Map widgets
+      var home = new Home({
+        view: mapView
+      });
+      mapView.ui.add(home, "bottom-left");
+      
+      var zoom = new Zoom({
+        view: mapView
+      });
+      mapView.ui.add(zoom, "bottom-left");
+      
+      var legend = new Legend({
+        view: mapView
+      });
+      mapView.ui.add(legend, "bottom-right")
+  
+    });
+  </script>
+
+</body>
+</html>
