@@ -156,7 +156,34 @@
         var id = event.target.getAttribute("data-id");
         if (id) {
           var webmap = webmaps[id];
-          mapView.map = webmap;
+          var mapViews = new MapView({
+            container: "mapViewDiv",
+            map: webmaps[0],
+            center: [90, 24],
+            scale: 5000000,
+            padding: {
+              top: 50,
+              bottom: 0
+            },
+            ui: {components: []}
+          });
+          
+          mapViews.map = webmap;
+          
+          var home2 = new Home({
+            view: mapViews
+          });
+          mapViews.ui.add(home2, "bottom-left");
+
+          var zoom2 = new Zoom({
+            view: mapViews
+          });
+          mapViews.ui.add(zoom2, "bottom-left");
+
+          var legend2 = new Legend({
+            view: mapViews
+          });
+          mapViews.ui.add(legend2, "bottom-right")
         }
       });
       
@@ -166,17 +193,17 @@
         view: mapView
       });
       mapView.ui.add(home, "bottom-left");
-      
+
       var zoom = new Zoom({
         view: mapView
       });
       mapView.ui.add(zoom, "bottom-left");
-      
+
       var legend = new Legend({
         view: mapView
       });
       mapView.ui.add(legend, "bottom-right")
-  
+
     });
   </script>
 
