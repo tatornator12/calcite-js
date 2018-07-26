@@ -123,86 +123,84 @@
         ];
      
      
-      // Map
-      var webmaps = webmapids.map(function(webmapid) {
-        return new WebMap({
-          portalItem: {
-            id: webmapid
-          }
-        });
-      });
-      
-      
-      // View
-      var mapView = new MapView({
-        container: "mapViewDiv",
-        map: webmaps[0],
+     var appConfig = {
+       mapView: null,
+       activeView: null,
+       container: "mapViewDiv"
+     };
+     
+     
+     var initialViewParams = {
         center: [90, 24],
         scale: 5000000,
         padding: {
           top: 50,
           bottom: 0
         },
-        ui: {components: []}
-      });
-      // Popup and panel sync
-      
-      mapView.when(function(){
-        CalciteMapArcGISSupport.setPopupPanelSync(mapView);
-      });
+        ui: {components: []},
+        container: appConfig.container
+     };
      
+    var webmaps = webmapids.map(function(webmapid) {
+      return new WebMap({
+        portalItem: {
+          id: webmapid
+        }
+      });
+     });
+      
+     appConfig.mapView = createView(initialViewParams, "2d");
+     appConfig.mapView.map = webmaps[0];
+     appConfig.activeView = appConfig.mapView;
+      
+      
+    function createView(params, type) {
+        var view;
+        var is2D = type === "2d";
+        if (is2D) {
+          view = new MapView(params);
+          
+          var home = new Home({
+            view: view
+          });
+          
+          var zoom = new Zoom({
+            view: view
+          });
+          
+          var legend = new Legend({
+            view: view
+          });
+
+          view.ui.add(home, "bottom-left");
+          view.ui.add(zoom, "bottom-left");
+          view.ui.add(legend, "bottom-right");
+          return view;
+        }
+    }
       
       on(document.querySelector(".dropdown"), ".indicator:click", function(event) {
         var id = event.target.getAttribute("data-id");
+        var newExtent = appConfig.activeView.extent.clone();
+        
+        var newViewParams = {
+          extent: newExtent,
+          padding: {
+            top: 50,
+            bottom: 0
+          },
+          ui: {components: []},
+          container: appConfig.container
+        };
+    
         if (id) {
           var webmap = webmaps[id];
-          var mapViews = new MapView({
-            container: "mapViewDiv",
-            map: webmaps[0],
-            center: [90, 24],
-            scale: 5000000,
-            padding: {
-              top: 50,
-              bottom: 0
-            },
-            ui: {components: []}
-          });
-          
-          mapViews.map = webmap;
-          
-          var home2 = new Home({
-            view: mapViews
-          });
-          mapViews.ui.add(home2, "bottom-left");
-
-          var zoom2 = new Zoom({
-            view: mapViews
-          });
-          mapViews.ui.add(zoom2, "bottom-left");
-
-          var legend2 = new Legend({
-            view: mapViews
-          });
-          mapViews.ui.add(legend2, "bottom-right")
+          appConfig.mapView = createView(newViewParams, "2d");
+          //appConfig.mapView.viewpoint = newViewParams
+          appConfig.mapView.map = webmap;
+          appConfig.activeView = appConfig.mapView;
         }
       });
-      
-      
-      // Map widgets
-      var home = new Home({
-        view: mapView
-      });
-      mapView.ui.add(home, "bottom-left");
-
-      var zoom = new Zoom({
-        view: mapView
-      });
-      mapView.ui.add(zoom, "bottom-left");
-
-      var legend = new Legend({
-        view: mapView
-      });
-      mapView.ui.add(legend, "bottom-right")
 
     });
   </script>
