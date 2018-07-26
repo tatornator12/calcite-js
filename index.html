@@ -133,6 +133,14 @@
      var initialViewParams = {
         center: [90, 24],
         scale: 5000000,
+        popup: {
+          dockEnabled: true,
+          dockOptions: {
+            breakpoint: false,
+            buttonEnabled: false,
+            position: "top-right"
+          }
+        },
         padding: {
           top: 50,
           bottom: 0
@@ -159,6 +167,9 @@
         var is2D = type === "2d";
         if (is2D) {
           view = new MapView(params);
+          view.when(function(){
+            CalciteMapArcGISSupport.setPopupPanelSync(view);
+          });
           
           var home = new Home({
             view: view
@@ -185,6 +196,14 @@
         
         var newViewParams = {
           extent: newExtent,
+          popup: {
+            dockEnabled: true,
+            dockOptions: {
+              breakpoint: false,
+              buttonEnabled: false,
+              position: "top-right"
+            }
+          },
           padding: {
             top: 50,
             bottom: 0
@@ -196,7 +215,6 @@
         if (id) {
           var webmap = webmaps[id];
           appConfig.mapView = createView(newViewParams, "2d");
-          //appConfig.mapView.viewpoint = newViewParams
           appConfig.mapView.map = webmap;
           appConfig.activeView = appConfig.mapView;
         }
